@@ -50,6 +50,7 @@ function ShopifyDashboardPage() {
   const [isGeneratingToken, setIsGeneratingToken] = useState(false);
   const [isDisconnectingStore, setIsDisconnectingStore] = useState(false);
   const [isSavingStoreSettings, setIsSavingStoreSettings] = useState(false);
+  const [storeSettingsError, setStoreSettingsError] = useState("");
   const lastLoadedSessionToken = useRef(null);
 
   const selectedUser = useMemo(
@@ -288,6 +289,7 @@ function ShopifyDashboardPage() {
     }
 
     setError("");
+    setStoreSettingsError("");
     setIsSavingStoreSettings(true);
 
     try {
@@ -303,7 +305,9 @@ function ShopifyDashboardPage() {
       });
       return true;
     } catch (settingsError) {
-      setError(settingsError.message);
+      const message = settingsError.message || "Failed to update store settings";
+      setError(message);
+      setStoreSettingsError(message);
       return false;
     } finally {
       setIsSavingStoreSettings(false);
@@ -380,6 +384,7 @@ function ShopifyDashboardPage() {
             key={selectedStore?.shopDomain || selectedStore?.storeName || "store-settings"}
             isSaving={isSavingStoreSettings}
             onSave={handleSaveStoreSettings}
+            saveError={storeSettingsError}
             selectedStore={selectedStore}
           />
         ) : activeTab === "all-orders" || activeSection === "orders" ? (

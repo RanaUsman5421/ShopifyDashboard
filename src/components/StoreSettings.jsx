@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const defaultSettings = {
   defaultCourier: "M&P",
@@ -38,13 +38,18 @@ function normalizeSettings(settings) {
   };
 }
 
-function StoreSettings({ isSaving, onSave, selectedStore }) {
+function StoreSettings({ isSaving, onSave, saveError, selectedStore }) {
   const savedSettings = useMemo(
     () => normalizeSettings(selectedStore?.settings),
     [selectedStore?.settings]
   );
   const [draftSettings, setDraftSettings] = useState(savedSettings);
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    setDraftSettings(savedSettings);
+    setMessage("");
+  }, [savedSettings]);
 
   const hasChanges = settingsGroups.some(
     (group) => draftSettings[group.key] !== savedSettings[group.key]
@@ -97,7 +102,11 @@ function StoreSettings({ isSaving, onSave, selectedStore }) {
           </button>
         </div>
 
-        {message ? (
+        {saveError ? (
+          <p className="mt-4 rounded border border-[#ffc8b9] bg-[#fff1ed] px-3 py-2 text-sm font-bold text-[#a5321e]">
+            {saveError}
+          </p>
+        ) : message ? (
           <p className="mt-4 rounded border border-[#cfe8d8] bg-[#f0fbf4] px-3 py-2 text-sm font-bold text-[#117a43]">
             {message}
           </p>
