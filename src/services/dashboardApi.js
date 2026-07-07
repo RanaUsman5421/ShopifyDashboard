@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://shopifybackend-fi6u.onrender.com"
+const API_BASE_URL = "http://localhost:5000"
 
 async function request(path, options = {}) {
   const url = `${API_BASE_URL}${path}`;
