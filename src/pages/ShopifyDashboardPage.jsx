@@ -26,6 +26,25 @@ import { buildDashboardMetrics } from "../utils/dashboardMetrics";
 
 const SESSION_KEY = "shopifyDashboardSession";
 
+function normalizeStoreSettings(settings) {
+  return {
+    defaultCourier: settings?.defaultCourier || "M&P",
+    defaultWeight: String(settings?.defaultWeight || "0.5"),
+    orderBooking: settings?.orderBooking || "Manual",
+  };
+}
+
+function storeSettingsMatch(currentSettings, requestedSettings) {
+  const current = normalizeStoreSettings(currentSettings);
+  const requested = normalizeStoreSettings(requestedSettings);
+
+  return (
+    current.defaultCourier === requested.defaultCourier &&
+    current.defaultWeight === requested.defaultWeight &&
+    current.orderBooking === requested.orderBooking
+  );
+}
+
 function readSavedSession() {
   try {
     return JSON.parse(localStorage.getItem(SESSION_KEY)) || null;
@@ -72,15 +91,22 @@ function ShopifyDashboardPage() {
   );
 
   const selectedStore = useMemo(() => {
-    return (
-      displayStores.find((store) => {
-        const key = store.shopDomain || store.storeName || store._id;
-        return key === selectedStoreKey;
-      }) ||
-      selectedData?.store ||
-      displayStores[0] ||
-      null
-    );
+    const selectedKey = selectedStoreKey;
+    const selectedFromData = selectedData?.store;
+    const selectedFromStores = displayStores.find((store) => {
+      const key = store.shopDomain || store.storeName || store._id;
+      return key === selectedKey;
+    });
+
+    if (selectedFromData) {
+      const selectedDataKey =
+        selectedFromData.shopDomain || selectedFromData.storeName || selectedFromData._id;
+      if (selectedDataKey === selectedKey) {
+        return selectedFromData;
+      }
+    }
+
+    return selectedFromStores || selectedFromData || displayStores[0] || null;
   }, [displayStores, selectedData?.store, selectedStoreKey]);
 
   const updateDashboardData = useCallback((nextData) => {
@@ -294,14 +320,24 @@ function ShopifyDashboardPage() {
 
     try {
       const nextData = await updateMyStoreSettings(session.token, storeKey, settings);
+      const refreshedData = await getMyShopifyData(session.token, storeKey);
+      const refreshedStore = refreshedData.store || nextData.store;
+
+      if (!storeSettingsMatch(refreshedStore?.settings, settings)) {
+        throw new Error("Store settings were saved, but the latest store data still shows old settings.");
+      }
+
       updateDashboardData({
         ...selectedData,
-        user: nextData.user,
-        stores: displayStores.map((store) => {
-          const currentKey = store.shopDomain || store.storeName || store._id;
-          return currentKey === storeKey ? nextData.store : store;
-        }),
-        store: nextData.store,
+        ...refreshedData,
+        user: refreshedData.user || nextData.user,
+        stores: Array.isArray(refreshedData.stores)
+          ? refreshedData.stores
+          : displayStores.map((store) => {
+              const currentKey = store.shopDomain || store.storeName || store._id;
+              return currentKey === storeKey ? refreshedStore : store;
+            }),
+        store: refreshedStore,
       });
       return true;
     } catch (settingsError) {
