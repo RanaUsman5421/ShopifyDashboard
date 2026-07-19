@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 const API_BASE_URL = "https://shopifybackend-fi6u.onrender.com"
+=======
+const API_BASE_URL = "https://shopifybackend-fi6u.onrender.com";
+>>>>>>> f762ac3ff27df2325f0843415ffc8d0324afd95e
 
 async function request(path, options = {}) {
   const url = `${API_BASE_URL}${path}`;
