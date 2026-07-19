@@ -32,7 +32,6 @@ const tabs = [
   { id: "couriers", label: "Couriers", icon: "truck" },
   { id: "all-orders", label: "All Orders", icon: "shoppingBag" },
   { id: "manage-store", label: "Manage Store", icon: "store" },
-  { id: "store-settings", label: "Store Settings", icon: "settings" },
 ];
 const orderTabs = [
   { label: "All Orders", icon: "orders" },
