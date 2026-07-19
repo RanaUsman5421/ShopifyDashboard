@@ -11,7 +11,6 @@ import SalesAnalytics from "../components/SalesAnalytics";
 import FinancePage from "../components/FinancePage";
 import CouriersPage from "../components/CouriersPage";
 import ManageStore from "../components/ManageStore";
-import StoreSettings from "../components/StoreSettings";
 import MembershipPage from "../components/MembershipPage";
 import { orderMixSeries, overallOrdersSeries, storeMixSeries } from "../data/sampleCharts";
 import {
