@@ -27,10 +27,13 @@ import { buildDashboardMetrics } from "../utils/dashboardMetrics";
 const SESSION_KEY = "shopifyDashboardSession";
 
 function normalizeStoreSettings(settings) {
+  const weight = settings?.defaultWeight || "0.5";
+  const numericWeight = Number(weight);
+
   return {
     defaultCourier: settings?.defaultCourier || "M&P",
-    defaultWeight: String(settings?.defaultWeight || "0.5"),
-    orderBooking: settings?.orderBooking || "Manual",
+    defaultWeight: Number.isFinite(numericWeight) ? String(numericWeight) : String(weight),
+    orderBooking: settings?.orderBooking || "Auto",
   };
 }
 
