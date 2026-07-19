@@ -97,7 +97,6 @@ function OrderRow({ order, index, currency }) {
           type="button"
           aria-label={`Open actions for ${order.orderName || order.orderNumber || "order"}`}
         >
-          <span className="text-3xl leading-[0.55]">...</span>
         </button>
       </div>
 
